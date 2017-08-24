@@ -1,21 +1,22 @@
 # VDRequest
 一个基于原生网络框架NSURLSession的请求封装，包含一般HTTP请求(回调默认为JSON解析)和表单上传文件(支持多文件)
 
-### 如何导入：
-##### CocoaPods
-已安装CocoaPods:`pod 'VDRequest'`
-##### 直接下载
-下载此项目后将`RequestTool`中的文件拖到需要添加的项目中，其中包含：
+## 如何导入：
+### CocoaPods
+#### 已安装CocoaPods:
+在项目的`Podfile`文件中加入`pod 'VDRequest'`后进入文件目录`pod install`,如果失败建议`pod update`
+#### 直接下载
+下载此项目后将`RequestTool`中的文件拖到需要添加的项目中，其中包含一下六个文件：
 
-* VDRequest.h
-* VDRequest.m
-* VDResponse.h
-* VDResponse.m
-* VDRequestManager.h
-* VDRequestManager.m
+1. `VDRequest.h`
+2. `VDRequest.m`
+3. `VDResponse.h`
+4. `VDResponse.m`
+5. `VDRequestManager.h`
+6. `VDRequestManager.m`
 
-### 如何使用：
-#### 以GET请求方法为例
+## 如何使用：
+### 以GET请求方法为例
 
 ````
 NSDictionary *params = @{
@@ -27,7 +28,7 @@ NSDictionary *params = @{
     }];
 ````
 
-#### 对应的链式方法如下：
+### 对应的链式方法如下：
 
 ```
 NSDictionary *params = @{
