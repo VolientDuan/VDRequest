@@ -40,4 +40,4 @@ VDRequestManager.defaultManager.GET(@"http://apicloud.mob.com/appstore/bank/card
 ```
 请求结果示例：
 
-![请求结果示例](https://github.com/VolientDuan/VDRequest/sources/img/eg/get_response.png)
+![请求结果示例](https://github.com/VolientDuan/VDRequest/blob/master/sources/img/eg/get_response.png)
