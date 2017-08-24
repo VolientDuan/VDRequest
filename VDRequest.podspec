@@ -5,9 +5,8 @@ Pod::Spec.new do |s|
     s.homepage     = 'https://github.com/VolientDuan/VDRequest'
     s.license      = 'MIT'
     s.authors      = {'volientDuan' => 'volientduan@163.com'}
-    s.platform     = :ios
-    s.ios.deployment_target = '8.0'
-    s.source       = {:git => 'https://github.com/VolientDuan/VDRequest.git', :tag => "{s.version}"}
+    s.platform     = :ios, '8.0'
+    s.source       = {:git => 'https://github.com/VolientDuan/VDRequest.git', :tag => s.version}
     s.source_files = 'VDRequest/RequestTool/*.{h,m}'
     s.requires_arc = true
 end
