@@ -7,9 +7,21 @@
 //
 
 #import "VDResponse.h"
+
+@implementation NSObject(VD_UTF8)
+
+- (NSString *)vd_utf8{
+    NSString *desc = [self description];
+    desc = [NSString stringWithCString:[desc cStringUsingEncoding:NSUTF8StringEncoding] encoding:NSNonLossyASCIIStringEncoding];
+    return desc;
+}
+
+@end
+
 @interface VDResponse()<NSXMLParserDelegate>
 
 @end
+
 @implementation VDResponse
 /**
  json返回数据处理

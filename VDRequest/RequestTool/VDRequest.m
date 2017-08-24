@@ -81,7 +81,10 @@
 #pragma mark 参数处理
 
 - (void)paramsHandler:(id)params{
-    if (params == nil) {
+    [self.HTTPMethod isEqualToString:@"GET"]?[self paramsGETHandler:params]:[self paramsPOSTHandler:params];
+}
+- (void)paramsPOSTHandler:(id)params{
+    if (params == nil||self.URL == nil) {
         return;
     }
     if ([params isKindOfClass:[NSData class]]) {
@@ -97,6 +100,22 @@
         
     }
 }
+- (void)paramsGETHandler:(id)params{
+    if (params == nil||self.URL == nil) {
+        return;
+    }else if ([params isKindOfClass:[NSString class]]){
+        self.URL = [NSURL URLWithString:[NSString stringWithFormat:@"%@&%@",self.URL.absoluteString,params]];
+    }else if ([params isKindOfClass:[NSDictionary class]]){
+        NSMutableString *mutableStr = [NSMutableString stringWithString:self.URL.absoluteString];
+        for (NSString *key in ((NSDictionary *)params).allKeys) {
+            [mutableStr appendFormat:@"&%@=%@",key,params[key]];
+        }
+        self.URL = [NSURL URLWithString:[self fixUrl:mutableStr]];
+    }else{
+        NSLog(@"错误的参数类型");
+    }
+}
+
 - (void)paramsFormDataHandler:(NSDictionary *)params{
     self.contentType = [[NSString alloc]initWithFormat:@"multipart/form-data; boundary=%@",self.boundary];
     NSString *beginBoundary = [NSString stringWithFormat:@"--%@",self.boundary];
@@ -158,6 +177,15 @@
     }
     return [str stringByReplacingOccurrencesOfString:@" " withString:@""];
 }
+- (NSString *)fixUrl:(NSString *)str{
+    NSString *urlStr = [str stringByReplacingOccurrencesOfString:@"?" withString:@"&"];
+    urlStr = [urlStr stringByReplacingOccurrencesOfString:@"&&" withString:@"&"];
+    NSRange range = [urlStr rangeOfString:@"&"];
+    if (range.location != NSNotFound) {
+        urlStr = [urlStr stringByReplacingCharactersInRange:range withString:@"?"];
+    }
+    return urlStr;
+}
 - (NSURL *)formartUrlWithApi:(NSString *)api{
     if (![self deleteSpace:api]) {
         return [NSURL URLWithString:[self deleteSpace:self.baseUrl]];
@@ -168,4 +196,5 @@
     firstUrl = [firstUrl stringByReplacingOccurrencesOfString:@"//" withString:@"/"];
     return [NSURL URLWithString:[self deleteSpace:[NSString stringWithFormat:@"%@://%@",scheme,firstUrl]]];
 }
+
 @end

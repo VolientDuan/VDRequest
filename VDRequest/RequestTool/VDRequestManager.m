@@ -98,7 +98,35 @@ static void vd_request_manager_queue_block(dispatch_block_t block){
         responseBlock(response, isSuccess, errorCode);
     }];
 }
-
+#pragma mark 链式方法
+- (void(^)(NSString *, id, VDResponseBlock))POST{
+    return ^(NSString *api, id params ,VDResponseBlock block){
+        [self POST:api params:params responseBlock:^(id response, BOOL isSuccess, NSInteger errorCode) {
+            block(response,isSuccess,errorCode);
+        }];
+    };
+}
+- (void(^)(NSString *, id, VDResponseBlock))GET{
+    return ^(NSString *api, id params ,VDResponseBlock block){
+        [self GET:api params:params responseBlock:^(id response, BOOL isSuccess, NSInteger errorCode) {
+            block(response,isSuccess,errorCode);
+        }];
+    };
+}
+- (void (^)(NSString *, NSString *, VDRequestType, id, VDResponseBlock))sendRequest{
+    return ^(NSString *api ,NSString *method , VDRequestType type,id params ,VDResponseBlock block){
+        [self sendRequestWithApi:api method:method type:type params:params responseBlock:^(id response, BOOL isSuccess, NSInteger errorCode) {
+            block(response,isSuccess,errorCode);
+        }];
+    };
+}
+- (void (^)(NSString *, id, NSDictionary *, VDResponseBlock))uploadFiles{
+    return ^(NSString *api ,id params , NSDictionary *files,VDResponseBlock block){
+        [self formDataUploadWithApi:api params:params files:files responseBlock:^(id response, BOOL isSuccess, NSInteger errorCode) {
+            block(response,isSuccess,errorCode);
+        }];
+    };
+}
 #pragma mark - handler
 - (NSDictionary *)combineParams:(NSDictionary *)params files:(NSDictionary *)files{
     NSMutableDictionary *result = [[NSMutableDictionary alloc]initWithDictionary:params];

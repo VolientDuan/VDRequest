@@ -48,4 +48,11 @@
                        params:(id)params
                         files:(NSDictionary *)files
                 responseBlock:(VDResponseBlock)responseBlock;
+
+#pragma mark - 链式方法 (和上面的方法一一对应, 满足某人(作者本人)的强迫症)
+
+- (void(^)(NSString *api, id params, VDResponseBlock block))POST;
+- (void(^)(NSString *api, id params, VDResponseBlock block))GET;
+- (void(^)(NSString *api, NSString *method, VDRequestType type, id params, VDResponseBlock block))sendRequest;
+- (void(^)(NSString *api, id params, NSDictionary *files,VDResponseBlock block))uploadFiles;
 @end

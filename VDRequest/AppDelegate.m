@@ -7,9 +7,7 @@
 //
 
 #import "AppDelegate.h"
-#import <Weibo_SDK/WeiboSDK.h>
 
-#define WEIBO_APP_KEY @"3119453249"
 
 @interface AppDelegate ()
 

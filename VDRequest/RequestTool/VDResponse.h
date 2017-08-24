@@ -7,6 +7,11 @@
 //
 
 #import <Foundation/Foundation.h>
+
+@interface NSObject(VD_UTF8)
+- (NSString *)vd_utf8;
+@end
+
 /*普通请求回调*/
 typedef void (^VDResponseBlock)(id response, BOOL isSuccess, NSInteger errorCode);
 
@@ -19,3 +24,5 @@ typedef NS_ENUM(NSInteger, VDResponseType){
 @property (nonatomic, assign)VDResponseType type;
 - (id (^)(NSData *data))responseHandle;
 @end
+
+
