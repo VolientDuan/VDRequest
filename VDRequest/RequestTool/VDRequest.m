@@ -175,7 +175,9 @@
     if (!str) {
         return nil;
     }
-    return [str stringByReplacingOccurrencesOfString:@" " withString:@""];
+    NSString *str1= [str stringByReplacingOccurrencesOfString:@" " withString:@""];
+    NSString *str2 = [str1 stringByReplacingOccurrencesOfString:@"\n" withString:@""];
+    return [str2 stringByReplacingOccurrencesOfString:@"\r" withString:@""];
 }
 - (NSString *)fixUrl:(NSString *)str{
     NSString *urlStr = [str stringByReplacingOccurrencesOfString:@"?" withString:@"&"];

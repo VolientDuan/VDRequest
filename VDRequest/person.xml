@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<person>
+    <student>
+        <name>duan</name>
+        <sex>男</sex>
+        <age>18</age>
+        <desc>an ioser</desc>
+    </student>
+    <student>
+        <name>li</name>
+        <sex>女</sex>
+        <age>19</age>
+        <desc>an androider</desc>
+    </student>
+    <student>
+        <name>wang</name>wang
+        <sex>男</sex>
+        <age>24</age>
+        <desc>an javer</desc>
+        <info>xixi haha</info>
+    </student>
+</person>

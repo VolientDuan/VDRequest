@@ -7,7 +7,6 @@
 //
 
 #import "VDResponse.h"
-
 @implementation NSObject(VD_UTF8)
 
 - (NSString *)vd_utf8{
@@ -20,9 +19,31 @@
 
 @interface VDResponse()<NSXMLParserDelegate>
 
+@property (nonatomic, strong)NSMutableArray *xmlDataArray;
+@property (nonatomic, strong)NSMutableDictionary *xmlDataDictionary;
+@property (nonatomic, strong)NSString *xmlCharacter;
+
 @end
 
 @implementation VDResponse
+- (NSString *)xmlCharacter{
+    if (!_xmlCharacter) {
+        _xmlCharacter = @"";
+    }
+    return _xmlCharacter;
+}
+- (NSMutableArray *)xmlDataArray{
+    if (!_xmlDataArray) {
+        _xmlDataArray = [NSMutableArray array];
+    }
+    return _xmlDataArray;
+}
+- (NSMutableDictionary *)xmlDataDictionary{
+    if (!_xmlDataDictionary) {
+        _xmlDataDictionary = [NSMutableDictionary dictionary];
+    }
+    return _xmlDataDictionary;
+}
 /**
  json返回数据处理
  
@@ -48,8 +69,12 @@
     NSXMLParser *parser = [[NSXMLParser alloc]initWithData:response];
     parser.delegate = self;
     [parser setShouldResolveExternalEntities:YES];
-    [parser parse];
-    NSLog(@"\n【VDResponse】xml response is develping!");
+    BOOL isSuccess = [parser parse];
+    if (isSuccess) {
+        
+    }else{
+        NSLog(@"\n【VDResponse】xml response parsing failure!");
+    }
     id xmlObject = nil;
     xmlObject = [[NSString alloc] initWithData:response encoding:NSUTF8StringEncoding];
     return xmlObject;
@@ -66,29 +91,41 @@
 }
 
 #pragma mark XML Parser Delegate
-- (void)parser:(NSXMLParser *)parser foundComment:(NSString *)comment{
-    
+- (NSString *)deleteSpace:(NSString *)str{
+    if (!str) {
+        return nil;
+    }
+    NSString *str1= [str stringByReplacingOccurrencesOfString:@" " withString:@""];
+    NSString *str2 = [str1 stringByReplacingOccurrencesOfString:@"\n" withString:@""];
+    return [str2 stringByReplacingOccurrencesOfString:@"\r" withString:@""];
 }
-- (void)parser:(NSXMLParser *)parser foundCDATA:(NSData *)CDATABlock{
-    
-}
-- (void)parserDidEndDocument:(NSXMLParser *)parser{
-    
-}
-- (void)parserDidStartDocument:(NSXMLParser *)parser{
-    
-}
-- (void)parser:(NSXMLParser *)parser didStartMappingPrefix:(NSString *)prefix toURI:(NSString *)namespaceURI{
-    
-    
-}
-- (void)parser:(NSXMLParser *)parser didEndElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName{
-    
+- (void)parser:(NSXMLParser *)parser didStartElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName attributes:(NSDictionary *)attributeDict{
+    NSMutableDictionary *dic = [NSMutableDictionary dictionary];
+    [dic setObject:@"" forKey:elementName];
+    [self.xmlDataArray addObject:dic];
+    NSLog(@"didStartElement:%@",elementName);
 }
 - (void)parser:(NSXMLParser *)parser foundCharacters:(NSString *)string{
+    NSLog(@"foundCharacters:%@",string);
+    self.xmlCharacter = [self deleteSpace:string];
+}
+- (void)parser:(NSXMLParser *)parser didEndElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName{
+    NSLog(@"didEndElement:%@",elementName);
+    NSMutableDictionary *dic = self.xmlDataArray[self.xmlDataArray.count-1];
+    dic[elementName] = self.xmlCharacter;
+    if (self.xmlDataArray.count > 1) {
+        NSMutableDictionary *supDic = self.xmlDataArray[self.xmlDataArray.count-2];
+        id value = supDic[supDic.allKeys[0]];
+        if ([value isKindOfClass:[NSString class]]) {
+            supDic[supDic.allKeys[0]] = dic;
+        }
+        [self.xmlDataArray removeObjectAtIndex:self.xmlDataArray.count-1];
+    }
+    NSLog(@"--------");
+}
+- (void)parserDidEndDocument:(NSXMLParser *)parser{
+    NSLog(@"-------parserDidEndDocument-------");
     
 }
-- (void)parser:(NSXMLParser *)parser didEndMappingPrefix:(NSString *)prefix{
-    
-}
+
 @end

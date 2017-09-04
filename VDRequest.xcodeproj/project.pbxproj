@@ -19,6 +19,8 @@
 		C77F35231F417C0000B1F7B4 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C77F35211F417C0000B1F7B4 /* LaunchScreen.storyboard */; };
 		C77F352E1F417C0000B1F7B4 /* VDRequestTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C77F352D1F417C0000B1F7B4 /* VDRequestTests.m */; };
 		C77F35391F417C0000B1F7B4 /* VDRequestUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = C77F35381F417C0000B1F7B4 /* VDRequestUITests.m */; };
+		C7B16C9B1F500953000F4175 /* person.xml in Resources */ = {isa = PBXBuildFile; fileRef = C7B16C9A1F500953000F4175 /* person.xml */; };
+		C7BADEE71F5D404100057257 /* XMLReader.m in Sources */ = {isa = PBXBuildFile; fileRef = C7BADEE61F5D404100057257 /* XMLReader.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -64,6 +66,9 @@
 		C77F35341F417C0000B1F7B4 /* VDRequestUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = VDRequestUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C77F35381F417C0000B1F7B4 /* VDRequestUITests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VDRequestUITests.m; sourceTree = "<group>"; };
 		C77F353A1F417C0000B1F7B4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		C7B16C9A1F500953000F4175 /* person.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = person.xml; sourceTree = "<group>"; };
+		C7BADEE51F5D404100057257 /* XMLReader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMLReader.h; sourceTree = "<group>"; };
+		C7BADEE61F5D404100057257 /* XMLReader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XMLReader.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -139,6 +144,8 @@
 		C77F35121F417C0000B1F7B4 /* VDRequest */ = {
 			isa = PBXGroup;
 			children = (
+				C7BADEE41F5D404100057257 /* XMLReader */,
+				C7B16C9A1F500953000F4175 /* person.xml */,
 				C77559B91F442C9600ED4256 /* RequestTool */,
 				C77F35161F417C0000B1F7B4 /* AppDelegate.h */,
 				C77F35171F417C0000B1F7B4 /* AppDelegate.m */,
@@ -177,6 +184,15 @@
 				C77F353A1F417C0000B1F7B4 /* Info.plist */,
 			);
 			path = VDRequestUITests;
+			sourceTree = "<group>";
+		};
+		C7BADEE41F5D404100057257 /* XMLReader */ = {
+			isa = PBXGroup;
+			children = (
+				C7BADEE51F5D404100057257 /* XMLReader.h */,
+				C7BADEE61F5D404100057257 /* XMLReader.m */,
+			);
+			path = XMLReader;
 			sourceTree = "<group>";
 		};
 		FB6223720CBA24120C7CFF90 /* Frameworks */ = {
@@ -296,6 +312,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C7B16C9B1F500953000F4175 /* person.xml in Resources */,
 				C77F35231F417C0000B1F7B4 /* LaunchScreen.storyboard in Resources */,
 				C77F35201F417C0000B1F7B4 /* Assets.xcassets in Resources */,
 				C77F351E1F417C0000B1F7B4 /* Main.storyboard in Resources */,
@@ -377,6 +394,7 @@
 				C77F35181F417C0000B1F7B4 /* AppDelegate.m in Sources */,
 				C77559C01F442C9600ED4256 /* VDRequest.m in Sources */,
 				C77F35151F417C0000B1F7B4 /* main.m in Sources */,
+				C7BADEE71F5D404100057257 /* XMLReader.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
