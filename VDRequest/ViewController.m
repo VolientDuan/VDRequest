@@ -7,7 +7,7 @@
 //
 
 #import "ViewController.h"
-#import "VDRequestManager.h"
+#import "VDRequest.h"
 
 @interface ViewController ()
 
@@ -22,7 +22,7 @@
                              @"key":@"201cd6c770038",
                              @"card":@"6228480402564890018"
                              };
-    VDRequestManager.defaultManager.GET(@"http://apicloud.mob.com/appstore/bank/card/query",params,^(id response, BOOL isSuccess, NSInteger errorCode) {
+    VDRequest.defaultManager.GET(@"http://apicloud.mob.com/appstore/bank/card/query",params,^(id response, BOOL isSuccess, NSInteger errorCode) {
         NSLog(@"\nresponse:%@\nerrorCode:%ld",[response vd_utf8],errorCode);
     });
     

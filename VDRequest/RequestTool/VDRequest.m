@@ -7,196 +7,139 @@
 //
 #import <UIKit/UIKit.h>
 #import "VDRequest.h"
-#define VDREQUEST_BOUNDARY @"VDREQUESTBOUNDARY"
-#define VD_LINE @"\r\n"
-@interface NSMutableData (body)
-- (void)appendStr:(NSString *)str;
 
-@end
-@implementation NSMutableData (body)
-- (void)appendStr:(NSString *)str{
-    [self appendData:[str dataUsingEncoding:NSUTF8StringEncoding]];
-}
-
-
-@end
-@interface VDRequest()
-
-/**
- 分割线
- */
-@property (nonatomic, strong)NSString *boundary;
-
-@end
 @implementation VDRequest
-
-- (NSString *)boundary{
-    if (!_boundary||_boundary.length==0) {
-        _boundary = VDREQUEST_BOUNDARY;
-    }
-    return _boundary;
+static dispatch_queue_t vd_request_manager_queue() {
+    static dispatch_queue_t vd_session_queue;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        vd_session_queue = dispatch_queue_create("com.volientduan.vdrequest.manager.queue", DISPATCH_QUEUE_SERIAL);
+    });
+    return vd_session_queue;
+}
+static void vd_request_manager_queue_block(dispatch_block_t block){
+    dispatch_sync(vd_request_manager_queue(), block);
+}
++ (VDRequest *)defaultManager{
+    static VDRequest *manager = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        manager = [[VDRequest alloc]init];
+    });
+    return manager;
 }
 
-- (void)setContentType:(NSString *)contentType{
-    [self addHeaderValue:contentType forKey:@"content-Type"];
-}
-- (void)setRequestType:(VDRequestType)requestType{
-    switch (requestType) {
-        case VDRequestTypeJson:
-            self.contentType = @"application/json";
-            break;
-        case VDRequestTypeFormData:
-            self.contentType = @"multipart/form-data";
-            break;
-        default:
-            break;
-    }
-}
 - (instancetype)init{
     self = [super init];
     if (self) {
-        [self defaultSet];
+        
     }
     return self;
 }
-- (void)defaultSet{
-    self.requestType = VDRequestTypeJson;//设置为json
-    self.timeoutInterval = 20;//超时时间设为20s
-}
-- (void)addHeaderValue:(NSString *)value forKey:(NSString *)key{
-    if (value) {
-        [self addValue:value forHTTPHeaderField:key];
+
+- (VDURLRequest *)request{
+    if (!_request) {
+        _request = [[VDURLRequest alloc]init];
     }
+    return _request;
 }
-- (VDRequest *(^)(NSString *, VDRequestType, NSString *, id))set{
-    return ^(NSString *method, VDRequestType type, NSString *api, id params){
-        self.HTTPMethod = method;
-        self.requestType = type;
-        [self urlHandler:api];
-        [self paramsHandler:params];
-        return self;
+- (VDResponse *)response{
+    if (!_response) {
+        _response = [[VDResponse alloc]init];
+    }
+    return _response;
+}
+#pragma mark - 请求方法
+- (void)sendRequest:(VDURLRequest *)request block:(VDResponseBlock)block{
+    if (!request.URL) {
+        return;
+    }
+    __block NSURLSessionTask *dataTask = nil;
+    vd_request_manager_queue_block(^{
+        dataTask = [[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+            BOOL isSuccess = NO;
+            if (((NSHTTPURLResponse *)response).statusCode == 200) {
+                isSuccess = YES;
+            }
+            dispatch_async(dispatch_get_main_queue(), ^{
+                block(self.response.responseHandle(data),isSuccess,error.code);
+            });
+            
+        }];
+    });
+    [dataTask resume];
+    
+}
+- (void)sendRequestWithApi:(NSString *)api method:(NSString *)method type:(VDRequestType)type params:(id)params responseBlock:(VDResponseBlock)responseBlock{
+    [self sendRequest:self.request.set(method,type,api,params) block:^(id response, BOOL isSuccess, NSInteger errorCode) {
+        if (responseBlock) {
+            responseBlock(response,isSuccess,errorCode);
+        }
+    }];
+}
+
+- (void)POST:(NSString *)api params:(id)params responseBlock:(VDResponseBlock)responseBlock{
+    [self sendRequestWithApi:api method:@"POST" type:self.request.requestType params:params responseBlock:^(id response, BOOL isSuccess, NSInteger errorCode) {
+        if (responseBlock) {
+            responseBlock(response,isSuccess,errorCode);
+        }
+    }];
+}
+- (void)GET:(NSString *)api params:(id)params responseBlock:(VDResponseBlock)responseBlock{
+    [self sendRequestWithApi:api method:@"GET" type:self.request.requestType params:params responseBlock:^(id response, BOOL isSuccess, NSInteger errorCode) {
+        if (responseBlock) {
+            responseBlock(response,isSuccess,errorCode);
+        }
+    }];
+}
+
+- (void)formDataUploadWithApi:(NSString *)api params:(id)params files:(NSDictionary *)files responseBlock:(VDResponseBlock)responseBlock{
+    [self sendRequestWithApi:api method:@"POST" type:VDRequestTypeFormData params:[self combineParams:params files:files] responseBlock:^(id response, BOOL isSuccess, NSInteger errorCode) {
+        responseBlock(response, isSuccess, errorCode);
+    }];
+}
+#pragma mark 链式方法
+- (void(^)(NSString *, id, VDResponseBlock))POST{
+    return ^(NSString *api, id params ,VDResponseBlock block){
+        [self POST:api params:params responseBlock:^(id response, BOOL isSuccess, NSInteger errorCode) {
+            block(response,isSuccess,errorCode);
+        }];
     };
 }
-
-#pragma mark 参数处理
-
-- (void)paramsHandler:(id)params{
-    [self.HTTPMethod isEqualToString:@"GET"]?[self paramsGETHandler:params]:[self paramsPOSTHandler:params];
+- (void(^)(NSString *, id, VDResponseBlock))GET{
+    return ^(NSString *api, id params ,VDResponseBlock block){
+        [self GET:api params:params responseBlock:^(id response, BOOL isSuccess, NSInteger errorCode) {
+            block(response,isSuccess,errorCode);
+        }];
+    };
 }
-- (void)paramsPOSTHandler:(id)params{
-    if (params == nil||self.URL == nil) {
-        return;
-    }
-    if ([params isKindOfClass:[NSData class]]) {
-        self.HTTPBody = params;
-    }else if ([params isKindOfClass:[NSString class]]){
-        self.HTTPBody = [params dataUsingEncoding:NSUTF8StringEncoding];
-    }else{
-        if (self.requestType == VDRequestTypeJson) {
-            self.HTTPBody = [NSJSONSerialization dataWithJSONObject:params options:kNilOptions error:NULL];
-        }else if (self.requestType == VDRequestTypeFormData){
-            [self paramsFormDataHandler:params];
-        }
-        
-    }
+- (void (^)(NSString *, NSString *, VDRequestType, id, VDResponseBlock))sendRequest{
+    return ^(NSString *api ,NSString *method , VDRequestType type,id params ,VDResponseBlock block){
+        [self sendRequestWithApi:api method:method type:type params:params responseBlock:^(id response, BOOL isSuccess, NSInteger errorCode) {
+            block(response,isSuccess,errorCode);
+        }];
+    };
 }
-- (void)paramsGETHandler:(id)params{
-    if (params == nil||self.URL == nil) {
-        return;
-    }else if ([params isKindOfClass:[NSString class]]){
-        self.URL = [NSURL URLWithString:[NSString stringWithFormat:@"%@&%@",self.URL.absoluteString,params]];
-    }else if ([params isKindOfClass:[NSDictionary class]]){
-        NSMutableString *mutableStr = [NSMutableString stringWithString:self.URL.absoluteString];
-        for (NSString *key in ((NSDictionary *)params).allKeys) {
-            [mutableStr appendFormat:@"&%@=%@",key,params[key]];
-        }
-        self.URL = [NSURL URLWithString:[self fixUrl:mutableStr]];
-    }else{
-        NSLog(@"错误的参数类型");
-    }
+- (void (^)(NSString *, id, NSDictionary *, VDResponseBlock))uploadFiles{
+    return ^(NSString *api ,id params , NSDictionary *files,VDResponseBlock block){
+        [self formDataUploadWithApi:api params:params files:files responseBlock:^(id response, BOOL isSuccess, NSInteger errorCode) {
+            block(response,isSuccess,errorCode);
+        }];
+    };
 }
-
-- (void)paramsFormDataHandler:(NSDictionary *)params{
-    self.contentType = [[NSString alloc]initWithFormat:@"multipart/form-data; boundary=%@",self.boundary];
-    NSString *beginBoundary = [NSString stringWithFormat:@"--%@",self.boundary];
-    NSString *endBoundary = [NSString stringWithFormat:@"%@--",beginBoundary];
-    NSMutableData *bodyData = [NSMutableData data];
-    NSArray *keys = params.allKeys;
-    for (NSString *key in keys) {
-        id value = params[key];
-        //分割线，换一行
-        [bodyData appendStr:[NSString stringWithFormat:@"%@%@",beginBoundary,VD_LINE]];
-        if ([value isKindOfClass:[UIImage class]]||[value isKindOfClass:[NSData class]]) {
-            [bodyData appendStr:[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"%@\"; filename=\"\"%@",key,VD_LINE]];
-            //设置文件类型:"application/octet-stream"为二进制流可转为任意文件形式，换两行
-            [bodyData appendStr:[NSString stringWithFormat:@"Content-Type: application/octet-stream; charset=utf-8%@%@",VD_LINE,VD_LINE]];
-            if ([value isKindOfClass:[UIImage class]]) {
-                [bodyData appendData:UIImageJPEGRepresentation(value, 1.0)];
-            }else{
-                [bodyData appendData:value];
+#pragma mark - handler
+- (NSDictionary *)combineParams:(NSDictionary *)params files:(NSDictionary *)files{
+    NSMutableDictionary *result = [[NSMutableDictionary alloc]initWithDictionary:params];
+    if (files) {
+        NSArray *keys = files.allKeys;
+        for (NSString *key in keys) {
+            id file = files[key];
+            if (files&&[file isKindOfClass:[NSData class]]&&[file isKindOfClass:[UIImage class]]) {
+                [result setObject:file forKey:key];
             }
-            //设置图片后换一行
-            [bodyData appendStr:VD_LINE];
-        }else{
-            //key后换两行 value后换一行
-            [bodyData appendStr:[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"%@\"%@%@%@%@",key,VD_LINE,VD_LINE,value,VD_LINE]];
         }
     }
-    //结束分割线，换一行
-    [bodyData appendStr:[NSString stringWithFormat:@"%@%@",endBoundary,VD_LINE]];
-    [self addHeaderValue:[NSString stringWithFormat:@"%lu", (unsigned long)[bodyData length]] forKey:@"Content-Length"];
-    self.HTTPBody = bodyData;
-}
-#pragma mark URL的处理
-
-- (void)urlHandler:(NSString *)api{
-    if ([self isUrl:api]) {
-        self.URL = [NSURL URLWithString:[self deleteSpace:api]];
-    }else{
-        if ([self isUrl:self.baseUrl]) {
-            self.URL = [self formartUrlWithApi:api];
-        }else{
-            NSLog(@"\n【VDRequest】:URL ERROR");
-        }
-    }
-}
-- (BOOL)isUrl:(NSString *)strUrl{
-    if (!strUrl) {
-        return NO;
-    }else{
-        NSURL *url = [NSURL URLWithString:[self deleteSpace:strUrl]];
-        if ([url.scheme isEqualToString:@"http"]||[url.scheme isEqualToString:@"https"]) {
-            return YES;
-        }
-    }
-    return NO;
-}
-- (NSString *)deleteSpace:(NSString *)str{
-    if (!str) {
-        return nil;
-    }
-    NSString *str1= [str stringByReplacingOccurrencesOfString:@" " withString:@""];
-    NSString *str2 = [str1 stringByReplacingOccurrencesOfString:@"\n" withString:@""];
-    return [str2 stringByReplacingOccurrencesOfString:@"\r" withString:@""];
-}
-- (NSString *)fixUrl:(NSString *)str{
-    NSString *urlStr = [str stringByReplacingOccurrencesOfString:@"?" withString:@"&"];
-    urlStr = [urlStr stringByReplacingOccurrencesOfString:@"&&" withString:@"&"];
-    NSRange range = [urlStr rangeOfString:@"&"];
-    if (range.location != NSNotFound) {
-        urlStr = [urlStr stringByReplacingCharactersInRange:range withString:@"?"];
-    }
-    return urlStr;
-}
-- (NSURL *)formartUrlWithApi:(NSString *)api{
-    if (![self deleteSpace:api]) {
-        return [NSURL URLWithString:[self deleteSpace:self.baseUrl]];
-    }
-    NSString *scheme = [NSURL URLWithString:self.baseUrl].scheme;
-    NSString *firstUrl = [self.baseUrl substringFromIndex:[scheme isEqualToString:@"http"]?7:8];
-    firstUrl = [NSString stringWithFormat:@"%@%@",firstUrl,api];
-    firstUrl = [firstUrl stringByReplacingOccurrencesOfString:@"//" withString:@"/"];
-    return [NSURL URLWithString:[self deleteSpace:[NSString stringWithFormat:@"%@://%@",scheme,firstUrl]]];
+    return result;
 }
 
 @end

@@ -8,8 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		788594DCF0E4C70A3AB7E633 /* libPods-VDRequest.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BCB9FAA8AF1D2D44061FE1D2 /* libPods-VDRequest.a */; };
-		C77559C01F442C9600ED4256 /* VDRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = C77559BB1F442C9600ED4256 /* VDRequest.m */; };
-		C77559C11F442C9600ED4256 /* VDRequestManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C77559BD1F442C9600ED4256 /* VDRequestManager.m */; };
+		C77559C01F442C9600ED4256 /* VDURLRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = C77559BB1F442C9600ED4256 /* VDURLRequest.m */; };
+		C77559C11F442C9600ED4256 /* VDRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = C77559BD1F442C9600ED4256 /* VDRequest.m */; };
 		C77559C21F442C9600ED4256 /* VDResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = C77559BF1F442C9600ED4256 /* VDResponse.m */; };
 		C77F35151F417C0000B1F7B4 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = C77F35141F417C0000B1F7B4 /* main.m */; };
 		C77F35181F417C0000B1F7B4 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = C77F35171F417C0000B1F7B4 /* AppDelegate.m */; };
@@ -43,10 +43,10 @@
 		B04C700948A06B50B99069C9 /* Pods-VDRequest.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VDRequest.release.xcconfig"; path = "Pods/Target Support Files/Pods-VDRequest/Pods-VDRequest.release.xcconfig"; sourceTree = "<group>"; };
 		BCB9FAA8AF1D2D44061FE1D2 /* libPods-VDRequest.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-VDRequest.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		BD4C27A53354E03AD236DCB4 /* Pods-VDRequest.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VDRequest.debug.xcconfig"; path = "Pods/Target Support Files/Pods-VDRequest/Pods-VDRequest.debug.xcconfig"; sourceTree = "<group>"; };
-		C77559BA1F442C9600ED4256 /* VDRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VDRequest.h; sourceTree = "<group>"; };
-		C77559BB1F442C9600ED4256 /* VDRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VDRequest.m; sourceTree = "<group>"; };
-		C77559BC1F442C9600ED4256 /* VDRequestManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VDRequestManager.h; sourceTree = "<group>"; };
-		C77559BD1F442C9600ED4256 /* VDRequestManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VDRequestManager.m; sourceTree = "<group>"; };
+		C77559BA1F442C9600ED4256 /* VDURLRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VDURLRequest.h; sourceTree = "<group>"; };
+		C77559BB1F442C9600ED4256 /* VDURLRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VDURLRequest.m; sourceTree = "<group>"; };
+		C77559BC1F442C9600ED4256 /* VDRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VDRequest.h; sourceTree = "<group>"; };
+		C77559BD1F442C9600ED4256 /* VDRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VDRequest.m; sourceTree = "<group>"; };
 		C77559BE1F442C9600ED4256 /* VDResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VDResponse.h; sourceTree = "<group>"; };
 		C77559BF1F442C9600ED4256 /* VDResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VDResponse.m; sourceTree = "<group>"; };
 		C77F35101F417C0000B1F7B4 /* VDRequest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VDRequest.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -106,12 +106,12 @@
 		C77559B91F442C9600ED4256 /* RequestTool */ = {
 			isa = PBXGroup;
 			children = (
-				C77559BA1F442C9600ED4256 /* VDRequest.h */,
-				C77559BB1F442C9600ED4256 /* VDRequest.m */,
+				C77559BA1F442C9600ED4256 /* VDURLRequest.h */,
+				C77559BB1F442C9600ED4256 /* VDURLRequest.m */,
 				C77559BE1F442C9600ED4256 /* VDResponse.h */,
 				C77559BF1F442C9600ED4256 /* VDResponse.m */,
-				C77559BC1F442C9600ED4256 /* VDRequestManager.h */,
-				C77559BD1F442C9600ED4256 /* VDRequestManager.m */,
+				C77559BC1F442C9600ED4256 /* VDRequest.h */,
+				C77559BD1F442C9600ED4256 /* VDRequest.m */,
 			);
 			path = RequestTool;
 			sourceTree = "<group>";
@@ -377,9 +377,9 @@
 			files = (
 				C77559C21F442C9600ED4256 /* VDResponse.m in Sources */,
 				C77F351B1F417C0000B1F7B4 /* ViewController.m in Sources */,
-				C77559C11F442C9600ED4256 /* VDRequestManager.m in Sources */,
+				C77559C11F442C9600ED4256 /* VDRequest.m in Sources */,
 				C77F35181F417C0000B1F7B4 /* AppDelegate.m in Sources */,
-				C77559C01F442C9600ED4256 /* VDRequest.m in Sources */,
+				C77559C01F442C9600ED4256 /* VDURLRequest.m in Sources */,
 				C77F35151F417C0000B1F7B4 /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
