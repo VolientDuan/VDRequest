@@ -7,7 +7,13 @@
 //
 #import <UIKit/UIKit.h>
 #import "VDRequest.h"
+#import "NSURLSessionVDExtend.h"
 
+@interface VDRequest()<NSURLSessionDelegate>
+@property (nonatomic, strong) NSProgress *uploadProgress;
+@property (nonatomic, strong) NSProgress *downloadProgress;
+
+@end
 @implementation VDRequest
 static dispatch_queue_t vd_request_manager_queue() {
     static dispatch_queue_t vd_session_queue;
@@ -32,7 +38,11 @@ static void vd_request_manager_queue_block(dispatch_block_t block){
 - (instancetype)init{
     self = [super init];
     if (self) {
+        self.uploadProgress = [[NSProgress alloc] initWithParent:nil userInfo:nil];
+        self.uploadProgress.totalUnitCount = NSURLSessionTransferSizeUnknown;
         
+        self.downloadProgress = [[NSProgress alloc] initWithParent:nil userInfo:nil];
+        self.downloadProgress.totalUnitCount = NSURLSessionTransferSizeUnknown;
     }
     return self;
 }
@@ -48,6 +58,67 @@ static void vd_request_manager_queue_block(dispatch_block_t block){
         _response = [[VDResponse alloc]init];
     }
     return _response;
+}
+#pragma mark - progress
+- (void)addProgressForTask:(NSURLSessionTask *)task{
+    __weak __typeof__(task) weakTask = task;
+    
+    self.uploadProgress.totalUnitCount = task.countOfBytesExpectedToSend;
+    self.downloadProgress.totalUnitCount = task.countOfBytesExpectedToReceive;
+    [self.uploadProgress setCancellable:YES];
+    [self.uploadProgress setCancellationHandler:^{
+        __typeof__(weakTask) strongTask = weakTask;
+        [strongTask cancel];
+    }];
+    [self.uploadProgress setPausable:YES];
+    [self.uploadProgress setPausingHandler:^{
+        __typeof__(weakTask) strongTask = weakTask;
+        [strongTask suspend];
+    }];
+    if ([self.uploadProgress respondsToSelector:@selector(setResumingHandler:)]) {
+        [self.uploadProgress setResumingHandler:^{
+            __typeof__(weakTask) strongTask = weakTask;
+            [strongTask resume];
+        }];
+    }
+    
+    [self.downloadProgress setCancellable:YES];
+    [self.downloadProgress setCancellationHandler:^{
+        __typeof__(weakTask) strongTask = weakTask;
+        [strongTask cancel];
+    }];
+    [self.downloadProgress setPausable:YES];
+    [self.downloadProgress setPausingHandler:^{
+        __typeof__(weakTask) strongTask = weakTask;
+        [strongTask suspend];
+    }];
+    
+    if ([self.downloadProgress respondsToSelector:@selector(setResumingHandler:)]) {
+        [self.downloadProgress setResumingHandler:^{
+            __typeof__(weakTask) strongTask = weakTask;
+            [strongTask resume];
+        }];
+    }
+    [task addObserver:self
+               forKeyPath:NSStringFromSelector(@selector(countOfBytesReceived))
+                  options:NSKeyValueObservingOptionNew
+                  context:NULL];
+    [task addObserver:self
+               forKeyPath:NSStringFromSelector(@selector(countOfBytesExpectedToReceive))
+                  options:NSKeyValueObservingOptionNew
+                  context:NULL];
+    
+    [task addObserver:self
+               forKeyPath:NSStringFromSelector(@selector(countOfBytesSent))
+                  options:NSKeyValueObservingOptionNew
+                  context:NULL];
+    [task addObserver:self
+               forKeyPath:NSStringFromSelector(@selector(countOfBytesExpectedToSend))
+                  options:NSKeyValueObservingOptionNew
+                  context:NULL];
+}
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context{
+    
 }
 #pragma mark - 请求方法
 - (void)sendRequest:(VDURLRequest *)request block:(VDResponseBlock)block{
@@ -68,7 +139,6 @@ static void vd_request_manager_queue_block(dispatch_block_t block){
         }];
     });
     [dataTask resume];
-    
 }
 - (void)sendRequestWithApi:(NSString *)api method:(NSString *)method type:(VDRequestType)type params:(id)params responseBlock:(VDResponseBlock)responseBlock{
     [self sendRequest:self.request.set(method,type,api,params) block:^(id response, BOOL isSuccess, NSInteger errorCode) {
@@ -140,6 +210,17 @@ static void vd_request_manager_queue_block(dispatch_block_t block){
         }
     }
     return result;
+}
+
+#pragma mark - NSURLSessionDelegate
+- (void)URLSession:(NSURLSession *)session didBecomeInvalidWithError:(NSError *)error{
+    
+}
+- (void)URLSession:(NSURLSession *)session didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge completionHandler:(void (^)(NSURLSessionAuthChallengeDisposition, NSURLCredential * _Nullable))completionHandler{
+    
+}
+- (void)URLSessionDidFinishEventsForBackgroundURLSession:(NSURLSession *)session{
+    
 }
 
 @end

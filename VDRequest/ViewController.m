@@ -29,7 +29,8 @@
     // xml解析示例(没去找免费xml接口了直接本地解析吧)
     NSData *data = [NSData dataWithContentsOfFile:[[NSBundle mainBundle]pathForResource:@"person.xml" ofType:nil]];
     VDResponse *resp = [[VDResponse alloc]init];
-    id result = [resp responseObjectXMLHandle:data];
+    resp.type = VDResponseTypeXml;
+    id result = resp.responseHandle(data);
     NSLog(@"reslut:%@",[result vd_utf8]);
     // Do any additional setup after loading the view, typically from a nib.
 }

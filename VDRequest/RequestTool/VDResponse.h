@@ -24,7 +24,6 @@ typedef NS_ENUM(NSInteger, VDResponseType){
 @property (nonatomic, assign)VDResponseType type;
 - (id (^)(NSData *data))responseHandle;
 
-- (id)responseObjectXMLHandle:(NSData *)response;
 @end
 
 
