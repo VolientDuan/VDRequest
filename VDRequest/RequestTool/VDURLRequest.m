@@ -65,7 +65,7 @@
 }
 - (void)addHeaderValue:(NSString *)value forKey:(NSString *)key{
     if (value) {
-        [self addValue:value forHTTPHeaderField:key];
+        [self setValue:value forHTTPHeaderField:key];
     }
 }
 - (VDURLRequest *(^)(NSString *, VDRequestType, NSString *, id))set{

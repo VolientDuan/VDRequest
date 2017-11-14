@@ -38,11 +38,11 @@ static void vd_request_manager_queue_block(dispatch_block_t block){
 - (instancetype)init{
     self = [super init];
     if (self) {
-        self.uploadProgress = [[NSProgress alloc] initWithParent:nil userInfo:nil];
-        self.uploadProgress.totalUnitCount = NSURLSessionTransferSizeUnknown;
-        
-        self.downloadProgress = [[NSProgress alloc] initWithParent:nil userInfo:nil];
-        self.downloadProgress.totalUnitCount = NSURLSessionTransferSizeUnknown;
+//        self.uploadProgress = [[NSProgress alloc] initWithParent:nil userInfo:nil];
+//        self.uploadProgress.totalUnitCount = NSURLSessionTransferSizeUnknown;
+//
+//        self.downloadProgress = [[NSProgress alloc] initWithParent:nil userInfo:nil];
+//        self.downloadProgress.totalUnitCount = NSURLSessionTransferSizeUnknown;
     }
     return self;
 }
@@ -59,6 +59,14 @@ static void vd_request_manager_queue_block(dispatch_block_t block){
     }
     return _response;
 }
+
+- (void)setBaseUrl:(NSString *)baseUrl{
+    if (!_baseUrl||![_baseUrl isEqualToString:baseUrl]) {
+        _baseUrl = baseUrl;
+        self.request.baseUrl = baseUrl;
+    }
+}
+
 #pragma mark - progress
 - (void)addProgressForTask:(NSURLSessionTask *)task{
     __weak __typeof__(task) weakTask = task;
