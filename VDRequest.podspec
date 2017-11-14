@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
     s.name         = 'VDRequest'
-    s.version      = '1.0.4'
+    s.version      = '1.0.5'
     s.summary      = 'An easy way to send request and upload file'
     s.homepage     = 'https://github.com/VolientDuan/VDRequest'
     s.license      = 'MIT'
