@@ -8,6 +8,11 @@
 
 #import <Foundation/Foundation.h>
 
+typedef NS_ENUM(NSInteger, VDRequestError) {
+    VDRequestErrorURL = 11111,
+    VDRequestErrorUnknown
+};
+
 @interface NSObject(VD_UTF8)
 - (NSString *)vd_utf8;
 @end
@@ -22,6 +27,8 @@ typedef NS_ENUM(NSInteger, VDResponseType){
 
 @interface VDResponse : NSObject
 @property (nonatomic, assign)VDResponseType type;
+@property (nonatomic, strong)NSURLResponse *currentResponse;
+@property (nonatomic, strong)NSError *currentError;
 - (id (^)(NSData *data))responseHandle;
 
 @end

@@ -4,7 +4,7 @@
 ## 如何导入：
 ### CocoaPods
 #### 已安装CocoaPods:
-在项目的`Podfile`文件中加入`pod 'VDRequest', '~> 1.0.5'`后进入文件目录`pod install`,如果失败建议`pod update VDRequest`
+在项目的`Podfile`文件中加入`pod 'VDRequest', '~> 1.0.6'`后进入文件目录`pod install`,如果失败建议`pod update VDRequest`
 #### 直接下载
 下载此项目后将`RequestTool`中的文件拖到需要添加的项目中，其中包含一下六个文件：
 

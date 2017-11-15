@@ -70,14 +70,21 @@
 }
 - (VDURLRequest *(^)(NSString *, VDRequestType, NSString *, id))set{
     return ^(NSString *method, VDRequestType type, NSString *api, id params){
-        self.HTTPMethod = method;
-        self.requestType = type;
-        [self urlHandler:api];
-        [self paramsHandler:params];
-        return self;
+        VDURLRequest *req = [self copyReq];
+        req.HTTPMethod = method;
+        req.requestType = type;
+        [req urlHandler:api];
+        [req paramsHandler:params];
+        return req;
     };
 }
-
+- (VDURLRequest *)copyReq{
+    VDURLRequest *req = [[VDURLRequest alloc]init];
+    req.baseUrl = self.baseUrl;
+    req.allHTTPHeaderFields = self.allHTTPHeaderFields;
+    req.timeoutInterval = self.timeoutInterval;
+    return req;
+}
 #pragma mark 参数处理
 
 - (void)paramsHandler:(id)params{

@@ -14,6 +14,7 @@
 @property (nonatomic, strong)VDURLRequest *request;
 @property (nonatomic, strong)VDResponse *response;
 @property (class,readonly,strong)VDRequest *defaultManager;
+@property (nonatomic, strong)VDURLRequest *currentRequest;
 
 @property (nonatomic, strong)NSString *baseUrl;
 //POST请求

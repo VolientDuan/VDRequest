@@ -10,6 +10,9 @@
 #import "NSURLSessionVDExtend.h"
 
 @interface VDRequest()<NSURLSessionDelegate>
+
+@property (nonatomic, strong)NSMutableArray *requestArray;
+
 @property (nonatomic, strong) NSProgress *uploadProgress;
 @property (nonatomic, strong) NSProgress *downloadProgress;
 
@@ -45,6 +48,15 @@ static void vd_request_manager_queue_block(dispatch_block_t block){
 //        self.downloadProgress.totalUnitCount = NSURLSessionTransferSizeUnknown;
     }
     return self;
+}
+
+#pragma mark - 属性
+
+- (NSMutableArray *)requestArray{
+    if (!_requestArray) {
+        _requestArray = [NSMutableArray array];
+    }
+    return _requestArray;
 }
 
 - (VDURLRequest *)request{
@@ -131,19 +143,32 @@ static void vd_request_manager_queue_block(dispatch_block_t block){
 #pragma mark - 请求方法
 - (void)sendRequest:(VDURLRequest *)request block:(VDResponseBlock)block{
     if (!request.URL) {
+        block(nil,NO,VDRequestErrorURL);
         return;
     }
     __block NSURLSessionTask *dataTask = nil;
     vd_request_manager_queue_block(^{
+        [self.requestArray addObject:request];
         dataTask = [[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
             BOOL isSuccess = NO;
-            if (((NSHTTPURLResponse *)response).statusCode == 200) {
-                isSuccess = YES;
+            NSInteger errorCode = VDRequestErrorUnknown;
+            if (response) {
+                errorCode = ((NSHTTPURLResponse *)response).statusCode;
+                if (((NSHTTPURLResponse *)response).statusCode == 200) {
+                    isSuccess = YES;
+                }
+            }else{
+                errorCode = error.code;
             }
             dispatch_async(dispatch_get_main_queue(), ^{
-                block(self.response.responseHandle(data),isSuccess,error.code);
+                self.currentRequest = request;
+                self.response.currentResponse = response;
+                self.response.currentError = error;
+                block(self.response.responseHandle(data),isSuccess,errorCode);
+                self.currentRequest = nil;
+                self.response.currentResponse = nil;
+                self.response.currentError = nil;
             });
-            
         }];
     });
     [dataTask resume];
